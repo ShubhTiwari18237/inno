@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Exercise Recommendation System</title>
+  <style>
+    /* CSS styles for the calculator and recommendation system */
+    body {
+      background-color: #f0f7fc;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333333;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #333333;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+    }
+
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .button {
+      background-color: #3498db;
+      color: #ffffff;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      display: inline-block;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .result-container {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .exercise-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .exercise-card {
+      width: 300px;
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .exercise-image {
+      max-width: 200px;
+      max-height: 200px;
+      margin: 10px auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Exercise Recommendation System</h1>
+
+    <form id="exercise-form">
+      <label for="pain-area">Select your pain area or weight loss goal:</label>
+      <select id="pain-area" required>
+        <option value="" disabled selected>Select an option</option>
+        <option value="neck">Neck</option>
+        <option value="back">Back</option>
+        <option value="knee">Knee</option>
+        <option value="hip">Hip</option>
+        <!-- Add more options as needed -->
+      </select>
+
+      <label for="height">Height (cm):</label>
+      <input type="number" id="height" required>
+
+      <label for="weight">Weight (kg):</label>
+      <input type="number" id="weight" required>
+
+      <label for="age">Age:</label>
+      <input type="number" id="age" required>
+
+      <div class="button-container">
+        <button class="button" type="submit">Get Recommendations</button>
+      </div>
+    </form>
+
+    <div class="result-container" id="result"></div>
+
+    <div class="exercise-container" id="exercise-recommendations"></div>
+  </div>
+
+  <script>
+    // Exercise recommendations data
+    const exerciseData = {
+      neck: [
+        { name: "Neck Stretch", image: "image/1.jpg" },
+        { name: "Shoulder Shrug", image: "image/2.jpg" },
+        { name: "Head Rotation", image: "image/3.png" }
+      ],
+      back: [
+        { name: "Plank", image: "plank.jpg" },
+        { name: "Superman", image: "superman.jpg" },
+        { name: "Bridge", image: "bridge.jpg" }
+      ],
+      knee: [
+        { name: "Squats", image: "squats.jpg" },
+        { name: "Lunges", image: "lunges.jpg" },
+        { name: "Leg Press", image: "leg_press.jpg" }
+      ],
+      hip: [
+        { name: "Hip Flexor Stretch", image: "hip_flexor_stretch.jpg" },
+        { name: "Hip Abduction", image: "hip_abduction.jpg" },
+        { name: "Glute Bridge", image: "glute_bridge.jpg" }
+      ]
+      // Add more pain areas and exercises as needed
+    };
+
+    function calculateBMI(event) {
+      event.preventDefault();
+
+      const painArea = document.getElementById("pain-area").value;
+      const heightInput = document.getElementById("height");
+      const weightInput = document.getElementById("weight");
+      const ageInput = document.getElementById("age");
+      const resultContainer = document.getElementById("result");
+      const exerciseContainer = document.getElementById("exercise-recommendations");
+
+      const height = parseFloat(heightInput.value);
+      const weight = parseFloat(weightInput.value);
+      const age = parseInt(ageInput.value);
+
+      if (isNaN(height) || isNaN(weight) || isNaN(age) || height <= 0 || weight <= 0 || age <= 0) {
+        resultContainer.innerHTML = "Please enter valid height, weight, and age.";
+        exerciseContainer.innerHTML = "";
+        return;
+      }
+
+      const bmi = weight / Math.pow(height / 100, 2);
+      const roundedBMI = bmi.toFixed(2);
+
+      let bmiCategory = "";
+      let exerciseList = "";
+
+      if (bmi < 18.5) {
+        bmiCategory = "Underweight";
+        if (age < 18) {
+          exerciseList = "Recommendations for Underweight Individuals (Age < 18): <br>- Cardio exercises <br>- Strength training";
+        } else {
+          exerciseList = "Recommendations for Underweight Individuals (Age >= 18): <br>- Weightlifting <br>- Resistance training";
+        }
+      } else if (bmi >= 18.5 && bmi < 24.9) {
+        bmiCategory = "Normal weight";
+        if (age < 18) {
+          exerciseList = "Recommendations for Normal Weight Individuals (Age < 18): <br>- Cardio exercises <br>- Sports activities";
+        } else {
+          exerciseList = "Recommendations for Normal Weight Individuals (Age >= 18): <br>- Cardio exercises <br>- Strength training";
+        }
+      } else if (bmi >= 24.9 && bmi < 29.9) {
+        bmiCategory = "Overweight";
+        if (age < 18) {
+          exerciseList = "Recommendations for Overweight Individuals (Age < 18): <br>- Cardio exercises <br>- Sports activities <br>- Strength training";
+        } else {
+          exerciseList = "Recommendations for Overweight Individuals (Age >= 18): <br>- Cardio exercises <br>- Strength training <br>- High-intensity interval training";
+        }
+      } else {
+        bmiCategory = "Obese";
+        if (age < 18) {
+          exerciseList = "Recommendations for Obese Individuals (Age < 18): <br>- Cardio exercises <br>- Sports activities <br>- Strength training <br>- Swimming";
+        } else {
+          exerciseList = "Recommendations for Obese Individuals (Age >= 18): <br>- Cardio exercises <br>- Strength training <br>- High-intensity interval training <br>- Swimming";
+        }
+      }
+
+      resultContainer.innerHTML = `Your BMI: <strong>${roundedBMI}</strong> (${bmiCategory})`;
+      exerciseContainer.innerHTML = "";
+
+      if (painArea && exerciseData.hasOwnProperty(painArea)) {
+        const exercises = exerciseData[painArea];
+        exercises.forEach(exercise => {
+          const exerciseCard = document.createElement("div");
+          exerciseCard.classList.add("exercise-card");
+
+          const exerciseImage = document.createElement("img");
+          exerciseImage.classList.add("exercise-image");
+          exerciseImage.src = exercise.image;
+          exerciseImage.alt = exercise.name;
+
+          const exerciseName = document.createElement("p");
+          exerciseName.innerHTML = exercise.name;
+
+          exerciseCard.appendChild(exerciseImage);
+          exerciseCard.appendChild(exerciseName);
+
+          exerciseContainer.appendChild(exerciseCard);
+        });
+      }
+    }
+
+    const form = document.getElementById("exercise-form");
+    form.addEventListener("submit", calculateBMI);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+Message it-scrum
+
+
+
+
+
+
+
+
+
